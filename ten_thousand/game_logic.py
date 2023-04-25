@@ -3,8 +3,13 @@ from collections import Counter
 
 
 class GameLogic:
+
     def __init__(self):
         pass
+
+    """
+    the below function will take an argument of num_dice and will return a tuple of random numbers between 1-6 and the length of the tuple is the same as the taken argument
+    """
 
     def roll_dice(int):
         list = []
@@ -12,6 +17,14 @@ class GameLogic:
             x = random.randint(1,6)
             list.append(x)
         return tuple(list)
+    
+    """
+    the function below takes argument of a tuple and works as :
+    The input to calculate_score function is a tuple of integers that represents a dice roll.
+    The output from calculate_score is an integer representing the roll's score according to rules of the game.
+    link to the rules :
+    https://en.wikipedia.org/wiki/Dice_10000
+    """
     
     def calculate_score(tup):
         unbancked_points = 0 
