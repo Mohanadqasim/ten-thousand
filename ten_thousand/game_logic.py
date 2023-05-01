@@ -105,3 +105,10 @@ class GameLogic:
             unbancked_points += 1500
 
         return unbancked_points
+    
+    def cheater_test(tup1,tup2):
+        input_test=tup1
+        for i in tup2:
+            if i not in input_test:
+                return False
+        return True

@@ -1,6 +1,8 @@
-from ten_thousand.game_logic import GameLogic
+# from ten_thousand.game_logic import GameLogic
+from game_logic import GameLogic
 dice_roller = GameLogic.roll_dice
 calculate_points = GameLogic.calculate_score
+validate_kept_dices=GameLogic.cheater_test
 total=0
 
 
@@ -53,23 +55,41 @@ def start_game(round=1,total_score=total,dices_num = 6):
     
 
     if calculate_points(first_roll) == 0 or dices_num == 0:
-        print("~~ WASTED ~~")
-        round += 1       
+        print("****************************************")
+        print("**        Zilch!!! Round over         **")
+        print("****************************************")
+        print("You banked 0 points in round {}".format(round))
+        print("Total score is 0 points")
+        round += 1
+        return start_game(round,total_score,dices_num=6)
     else:
         print("Enter dice to keep, or (q)uit:")
         user_response = input("> ")
         if user_response == "q":
-            end_game(total_score)
+            return end_game(total_score)
         else:
             kept_dices = tuple(int (x) for x in user_response)
-            dices_num= dices_num-len(kept_dices)
-            score = calculate_points(kept_dices)
-            
-            # for i in kept_dices:
-            #     if i not in dices:
-            #         print("~~ WASTED ~~")
-            #         return start_game(round=1,total_score=total,dices_num = 6)
+            cheating_test=validate_kept_dices(first_roll,kept_dices)
+            while not cheating_test:
+                print("""Cheater!!! Or possibly made a typo...""")
+                print("*** {} ***".format(dices_num))
+                print("Enter dice to keep, or (q)uit:")
+                user_response=input('> ')
+                if user_response == "q":
+                    return end_game(total_score)
                 
+                else:    
+                    kept_dices = tuple(int (x) for x in user_response)
+                    cheating_test = validate_kept_dices(first_roll,kept_dices)
+            
+            if len(kept_dices) == 6:
+                score = calculate_points(kept_dices)
+            else:
+                dices_num= dices_num-len(kept_dices)
+                score = calculate_points(kept_dices)
+        
+            
+                 
             print("You have {} unbanked points and {} dice remaining".format(score, dices_num))
             print("(r)oll again, (b)ank your points or (q)uit:")
 
