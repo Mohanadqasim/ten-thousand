@@ -105,3 +105,35 @@ class GameLogic:
             unbancked_points += 1500
 
         return unbancked_points
+    
+    def validate_keepers(tup1,tup2):
+         """this function will take two tuples and check if the first tuple contain the value from the scond tuple with the same itarrtion"""
+         to_test_cheater = list(tup1)
+         for i in tup2:
+            if i not in to_test_cheater:
+                return False             
+            index = to_test_cheater.index(i)
+            to_test_cheater.pop(index)
+         return True
+    
+    def get_scorers(dices):
+        """ this function will take a tuple and return a tuple contain the values that give a score """
+
+        all_dice_score = GameLogic.calculate_score(dices)
+        scorers = []
+        input_list = list(dices)
+        for i,val in enumerate(input_list):
+            input_list.pop(i)
+            element_score = GameLogic.calculate_score(tuple(input_list))
+            if element_score != all_dice_score:
+                scorers.append(val)
+                input_list.insert(i,val)
+            else:
+                input_list.insert(i,val)   
+        scorers_tuple = tuple(scorers) 
+        # print(scorers_tuple)       
+        return scorers_tuple
+
+
+if __name__=="__main__":
+    GameLogic.get_scorers((1,2,3,4,5,6))
