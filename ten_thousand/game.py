@@ -1,9 +1,9 @@
-# from ten_thousand.game_logic import GameLogic
-from game_logic import GameLogic
+from ten_thousand.game_logic import GameLogic
+# from game_logic import GameLogic
 dice_roller = GameLogic.roll_dice
 calculate_points = GameLogic.calculate_score
-validate_kept_dices=GameLogic.cheater_test
-total=0
+validate_keepers = GameLogic.validate_keepers
+get_scorers = GameLogic.get_scorers
 
 
 def play(roller =GameLogic.roll_dice):
@@ -40,101 +40,87 @@ def quitter():
 
 
 
-def start_game(round=1,total_score=total,dices_num = 6):
-    """
-    this function is responsible for rolling the 6 dices and saving the dices that user wants to keep and calclate their points and :
-    1-playing the next round without banking the points by responding with 'r'
-    2-playing the next round and have the points banked by responding with 'b'
-    3-quit the game by responding with 'q'
-    """
+def start_game(round=1, total_score=0, dices_num=6, points=0, new_round=True):
+    """this function starts the rounds when the user type y to start the game"""
 
-    
+    if new_round:
+        print("Starting round {}".format(round))
     first_roll = dice_roller(dices_num)
-    dices = " ".join(str (x) for x in first_roll)
-    print("Starting round {}\nRolling {} dice...\n*** {} ***".format(round, dices_num, dices))
-    
+    dices = " ".join(str(x) for x in first_roll)
+    print("Rolling {} dice...\n*** {} ***".format(dices_num, dices))
 
-    if calculate_points(first_roll) == 0 or dices_num == 0:
+    if calculate_points(first_roll) == 0:
         print("****************************************")
         print("**        Zilch!!! Round over         **")
         print("****************************************")
         print("You banked 0 points in round {}".format(round))
-        print("Total score is 0 points")
+        print("Total score is {} points".format(total_score))
         round += 1
-        return start_game(round,total_score,dices_num=6)
-    else:
-        print("Enter dice to keep, or (q)uit:")
-        user_response = input("> ")
-        if user_response == "q":
-            return end_game(total_score)
-        else:
-            kept_dices = tuple(int (x) for x in user_response)
-            cheating_test=validate_kept_dices(first_roll,kept_dices)
-            while not cheating_test:
-                print("""Cheater!!! Or possibly made a typo...""")
-                print("*** {} ***".format(dices_num))
-                print("Enter dice to keep, or (q)uit:")
-                user_response=input('> ')
-                if user_response == "q":
-                    return end_game(total_score)
-                
-                else:    
-                    kept_dices = tuple(int (x) for x in user_response)
-                    cheating_test = validate_kept_dices(first_roll,kept_dices)
-            
-            if len(kept_dices) == 6:
-                score = calculate_points(kept_dices)
-            else:
-                dices_num= dices_num-len(kept_dices)
-                score = calculate_points(kept_dices)
-        
-            
-                 
-            print("You have {} unbanked points and {} dice remaining".format(score, dices_num))
-            print("(r)oll again, (b)ank your points or (q)uit:")
+        points = 0
+        return start_game(round, total_score, dices_num=6)
 
-            user_choice = input("> ")
+    print("Enter dice to keep, or (q)uit:")
+    user_choice = input('> ').replace(' ', '')
+
+    if user_choice == "q":
+        end_game(total_score)
+
+    else:
+        dices_to_keep = tuple(int(x) for x in user_choice)
+        cheat_test = validate_keepers(first_roll, dices_to_keep)
+        check_hot_dice = get_scorers(dices_to_keep)
+        if len(check_hot_dice) == 6:
+            points += calculate_points(dices_to_keep)
+
+        while not cheat_test:
+            print("""Cheater!!! Or possibly made a typo...""")
+            print("*** {} ***".format(dices))
+            print("Enter dice to keep, or (q)uit:")
+            user_choice = input('> ')
 
             if user_choice == "q":
-                end_game(total_score)
-            elif user_choice == "r":
-                if dices_num > 0 :
-                    total_score += score
-                    start_game(round,total_score,dices_num)
-                else:
-                    print("~~ WASTED ~~")
-                    round+=1
-                    start_game(round=1,total_score=total,dices_num = 6)
-                
-            elif user_choice == "b":
-                bank(score,round,total_score)
+                return end_game(total_score)
+
+            else:
+                dices_to_keep = tuple(int(x) for x in user_choice if x.isdigit())
+                cheat_test = validate_keepers(first_roll, dices_to_keep)
 
 
+        if len(dices_to_keep) != 6:
+            dices_num = dices_num - len(dices_to_keep)
+            points += calculate_points(dices_to_keep)
+
+        print("You have {} unbanked points and {} dice remaining".format(points, dices_num))
+        print("(r)oll again, (b)ank your points or (q)uit:")
+        user_choice = input('> ')
+
+        if user_choice == 'q':
+            end_game(total_score)
+        elif user_choice == 'r':
+            if dices_num > 0:
+                start_game(round, total_score, dices_num, points, new_round=False)
+            else:
+                # print('~~ WASTED ~~')
+                # round += 1
+                start_game(round, total_score, dices_num=6, points=points,new_round=False)
+        elif user_choice == "b":
+            bank(round, total_score, points)
 
 
+def bank(round, total_score, points):
+    """this function bank points when the user type b to store his point"""
 
-
-def bank(score,round,total_score):
-    """
-    this function is responsible for saving the points for the user and start the next round
-    
-    """
-    total_score += score
-    print("You banked {} points in round {}\nTotal score is {} points".format(score,round,total_score))
+    total_score += points
+    print("You banked {} points in round {}\nTotal score is {} points".format(points, round, total_score))
     round += 1
-    start_game(round,total_score)
-
-
-
-
+    # print('Starting round {}'.format(round))
+    start_game(round, total_score)
 
 
 def end_game(points):
-    """
-    this function quit the ten thousand game whenever user's response is "q"
-    
-    """
+    """this function print a string when the player type q"""
     print("Thanks for playing. You earned {} points".format(points))
+
 
 if __name__ == "__main__":
     play()
