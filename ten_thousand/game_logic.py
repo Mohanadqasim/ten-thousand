@@ -101,8 +101,13 @@ class GameLogic:
              unbancked_points = 2000
         
 ######################################### three pairs ####################################################
-        if len(num_counter) == 3 and all(count == 2 for count in num_counter.values()):
-            unbancked_points += 1500
+        if len(num_counter) == 3 and len(set(num_counter.values())) == 1 and list(set(num_counter.values()))[0] == 2:
+             unbancked_points = 1500
+        # Double Trips when 2 sets of a 3 of a kind are hit
+        if len(num_counter) == 2 and list(set(num_counter.values()))[0] == 3:
+             unbancked_points = unbancked_points
+        # if len(num_counter) == 3 and all(count == 2 for count in num_counter.values()):
+        #     unbancked_points += 1500
 
         return unbancked_points
     
