@@ -6,7 +6,7 @@ validate_keepers = GameLogic.validate_keepers
 get_scorers = GameLogic.get_scorers
 
 
-def play(roller =GameLogic.roll_dice):
+def play(roller =GameLogic.roll_dice,num_rounds=10):
     """
     this function starts the game and asks the user if he wants to play or not
     
@@ -17,7 +17,7 @@ def play(roller =GameLogic.roll_dice):
     print("(y)es to play or (n)o to decline")
     response = input("> ")
     if response == "y":
-        start_game()
+        start_game(num_rounds)
     elif response == "n":
         quitter()
     else:
@@ -40,7 +40,7 @@ def quitter():
 
 
 
-def start_game(round=1, total_score=0, dices_num=6, points=0, new_round=True):
+def start_game(num_rounds,round=1, total_score=0, dices_num=6, points=0, new_round=True):
     """this function starts the rounds when the user type y to start the game"""
 
     if new_round:
@@ -55,9 +55,12 @@ def start_game(round=1, total_score=0, dices_num=6, points=0, new_round=True):
         print("****************************************")
         print("You banked 0 points in round {}".format(round))
         print("Total score is {} points".format(total_score))
+        if round == num_rounds:
+            return end_game(total_score)
         round += 1
         points = 0
-        return start_game(round, total_score, dices_num=6)
+        return start_game(num_rounds,round, total_score, dices_num=6)
+    
 
     print("Enter dice to keep, or (q)uit:")
     user_choice = input('> ').replace(' ', '')
@@ -98,23 +101,25 @@ def start_game(round=1, total_score=0, dices_num=6, points=0, new_round=True):
             end_game(total_score)
         elif user_choice == 'r':
             if dices_num > 0:
-                start_game(round, total_score, dices_num, points, new_round=False)
+                start_game(num_rounds,round, total_score, dices_num, points, new_round=False)
             else:
                 # print('~~ WASTED ~~')
                 # round += 1
-                start_game(round, total_score, dices_num=6, points=points,new_round=False)
+                start_game(num_rounds,round, total_score, dices_num=6, points=points,new_round=False)
         elif user_choice == "b":
-            bank(round, total_score, points)
+            bank(num_rounds,round, total_score, points)
 
 
-def bank(round, total_score, points):
+def bank(num_rounds,round, total_score, points):
     """this function bank points when the user type b to store his point"""
 
     total_score += points
     print("You banked {} points in round {}\nTotal score is {} points".format(points, round, total_score))
+    if round == num_rounds:
+       return end_game(total_score)
     round += 1
     # print('Starting round {}'.format(round))
-    start_game(round, total_score)
+    start_game(num_rounds,round, total_score)
 
 
 def end_game(points):
