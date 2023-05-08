@@ -47,7 +47,8 @@ def start_game(num_rounds,round=1, total_score=0, dices_num=6, points=0, new_rou
         print("Starting round {}".format(round))
     first_roll = dice_roller(dices_num)
     dices = " ".join(str(x) for x in first_roll)
-    print("Rolling {} dice...\n*** {} ***".format(dices_num, dices))
+    print("Rolling {} dice...".format(dices_num))
+    print("*** {} ***".format(dices))
 
     if calculate_points(first_roll) == 0:
         print("****************************************")
